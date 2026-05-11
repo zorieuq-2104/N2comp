@@ -39,6 +39,37 @@ localidades = {
 }
 
 # =========================
+# SESSION STATE (PERSISTÊNCIA)
+# =========================
+if "valores" not in st.session_state:
+    st.session_state.valores = {
+        "area": 100,
+        "quartos": 2,
+        "banheiros": 2,
+        "vagas": 1,
+        "suites": 1,
+        "andar": 5,
+        "idade": 10,
+        "condominio": 500,
+        "elevador": 1,
+        "portaria": 1,
+        "piscina": 0,
+        "academia": 0,
+        "churrasqueira": 0,
+        "varanda": 1,
+        "mobiliado": 0,
+        "ar_condicionado": 0,
+        "reformado": 0,
+        "perto_metro": 0,
+        "vista_livre": 0,
+        "dist_supermercado": 2,
+        "dist_posto": 2,
+        "dist_hospital": 5
+    }
+
+valores = st.session_state.valores
+
+# =========================
 # CIDADE / BAIRRO
 # =========================
 col1, col2 = st.columns(2)
@@ -48,34 +79,6 @@ with col1:
 
 with col2:
     bairro = st.selectbox("Bairro", list(localidades[cidade].keys()))
-
-# =========================
-# VALORES PADRÃO (IMPORTANTE)
-# =========================
-valores = {
-    "area": 100,
-    "quartos": 2,
-    "banheiros": 2,
-    "vagas": 1,
-    "suites": 1,
-    "andar": 5,
-    "idade": 10,
-    "condominio": 500,
-    "elevador": 1,
-    "portaria": 1,
-    "piscina": 0,
-    "academia": 0,
-    "churrasqueira": 0,
-    "varanda": 1,
-    "mobiliado": 0,
-    "ar_condicionado": 0,
-    "reformado": 0,
-    "perto_metro": 0,
-    "vista_livre": 0,
-    "dist_supermercado": 2,
-    "dist_posto": 2,
-    "dist_hospital": 5
-}
 
 # =========================
 # GRUPOS
@@ -90,38 +93,38 @@ grupo = st.selectbox("Escolha o grupo", [
 ])
 
 # =========================
-# INPUTS POR GRUPO
+# INPUTS POR GRUPO (COM MEMÓRIA)
 # =========================
 
 if grupo == "Estrutura":
-    valores["area"] = st.slider("Área (m²)", 40, 200)
-    valores["quartos"] = st.slider("Quartos", 1, 5)
-    valores["banheiros"] = st.slider("Banheiros", 1, 4)
-    valores["vagas"] = st.slider("Vagas", 0, 3)
-    valores["suites"] = st.slider("Suítes", 0, 3)
-    valores["andar"] = st.slider("Andar", 0, 30)
-    valores["idade"] = st.slider("Idade do imóvel", 0, 50)
+    valores["area"] = st.slider("Área (m²)", 40, 200, valores["area"])
+    valores["quartos"] = st.slider("Quartos", 1, 5, valores["quartos"])
+    valores["banheiros"] = st.slider("Banheiros", 1, 4, valores["banheiros"])
+    valores["vagas"] = st.slider("Vagas", 0, 3, valores["vagas"])
+    valores["suites"] = st.slider("Suítes", 0, 3, valores["suites"])
+    valores["andar"] = st.slider("Andar", 0, 30, valores["andar"])
+    valores["idade"] = st.slider("Idade do imóvel", 0, 50, valores["idade"])
 
 elif grupo == "Condomínio":
-    valores["condominio"] = st.slider("Condomínio (R$)", 200, 1500)
-    valores["elevador"] = int(st.checkbox("Elevador"))
-    valores["portaria"] = int(st.checkbox("Portaria"))
-    valores["piscina"] = int(st.checkbox("Piscina"))
-    valores["academia"] = int(st.checkbox("Academia"))
-    valores["churrasqueira"] = int(st.checkbox("Churrasqueira"))
-    valores["varanda"] = int(st.checkbox("Varanda"))
+    valores["condominio"] = st.slider("Condomínio (R$)", 200, 1500, valores["condominio"])
+    valores["elevador"] = int(st.checkbox("Elevador", valores["elevador"]))
+    valores["portaria"] = int(st.checkbox("Portaria", valores["portaria"]))
+    valores["piscina"] = int(st.checkbox("Piscina", valores["piscina"]))
+    valores["academia"] = int(st.checkbox("Academia", valores["academia"]))
+    valores["churrasqueira"] = int(st.checkbox("Churrasqueira", valores["churrasqueira"]))
+    valores["varanda"] = int(st.checkbox("Varanda", valores["varanda"]))
 
 elif grupo == "Interior":
-    valores["mobiliado"] = int(st.checkbox("Mobiliado"))
-    valores["ar_condicionado"] = int(st.checkbox("Ar-condicionado"))
-    valores["reformado"] = int(st.checkbox("Reformado"))
+    valores["mobiliado"] = int(st.checkbox("Mobiliado", valores["mobiliado"]))
+    valores["ar_condicionado"] = int(st.checkbox("Ar-condicionado", valores["ar_condicionado"]))
+    valores["reformado"] = int(st.checkbox("Reformado", valores["reformado"]))
 
 elif grupo == "Localização":
-    valores["perto_metro"] = int(st.checkbox("Perto de transporte"))
-    valores["vista_livre"] = int(st.checkbox("Vista livre"))
-    valores["dist_supermercado"] = st.slider("Distância supermercado (km)", 0.1, 5.0)
-    valores["dist_posto"] = st.slider("Distância posto (km)", 0.1, 5.0)
-    valores["dist_hospital"] = st.slider("Distância hospital (km)", 0.1, 10.0)
+    valores["perto_metro"] = int(st.checkbox("Perto de transporte", valores["perto_metro"]))
+    valores["vista_livre"] = int(st.checkbox("Vista livre", valores["vista_livre"]))
+    valores["dist_supermercado"] = st.slider("Distância supermercado (km)", 0.1, 5.0, valores["dist_supermercado"])
+    valores["dist_posto"] = st.slider("Distância posto (km)", 0.1, 5.0, valores["dist_posto"])
+    valores["dist_hospital"] = st.slider("Distância hospital (km)", 0.1, 10.0, valores["dist_hospital"])
 
 # =========================
 # MODELO
@@ -216,8 +219,8 @@ if st.button("💰 Calcular Preço"):
     entrada = pd.DataFrame(columns=colunas)
     entrada.loc[0] = 0
 
-    for chave, valor in valores.items():
-        entrada[chave] = valor
+    for k, v in valores.items():
+        entrada[k] = v
 
     entrada[f"cidade_{cidade}"] = 1
     entrada[f"bairro_{bairro}"] = 1
