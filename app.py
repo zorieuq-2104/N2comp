@@ -39,7 +39,7 @@ localidades = {
 }
 
 # =========================
-# SESSION STATE (PERSISTÊNCIA)
+# SESSION STATE (NÃO RESETA VALORES)
 # =========================
 if "valores" not in st.session_state:
     st.session_state.valores = {
@@ -93,7 +93,7 @@ grupo = st.selectbox("Escolha o grupo", [
 ])
 
 # =========================
-# INPUTS POR GRUPO (COM MEMÓRIA)
+# INPUTS POR GRUPO
 # =========================
 
 if grupo == "Estrutura":
@@ -107,24 +107,33 @@ if grupo == "Estrutura":
 
 elif grupo == "Condomínio":
     valores["condominio"] = st.slider("Condomínio (R$)", 200, 1500, valores["condominio"])
-    valores["elevador"] = int(st.checkbox("Elevador", valores["elevador"]))
-    valores["portaria"] = int(st.checkbox("Portaria", valores["portaria"]))
-    valores["piscina"] = int(st.checkbox("Piscina", valores["piscina"]))
-    valores["academia"] = int(st.checkbox("Academia", valores["academia"]))
-    valores["churrasqueira"] = int(st.checkbox("Churrasqueira", valores["churrasqueira"]))
-    valores["varanda"] = int(st.checkbox("Varanda", valores["varanda"]))
+    valores["elevador"] = int(st.checkbox("Elevador", bool(valores["elevador"])))
+    valores["portaria"] = int(st.checkbox("Portaria", bool(valores["portaria"])))
+    valores["piscina"] = int(st.checkbox("Piscina", bool(valores["piscina"])))
+    valores["academia"] = int(st.checkbox("Academia", bool(valores["academia"])))
+    valores["churrasqueira"] = int(st.checkbox("Churrasqueira", bool(valores["churrasqueira"])))
+    valores["varanda"] = int(st.checkbox("Varanda", bool(valores["varanda"])))
 
 elif grupo == "Interior":
-    valores["mobiliado"] = int(st.checkbox("Mobiliado", valores["mobiliado"]))
-    valores["ar_condicionado"] = int(st.checkbox("Ar-condicionado", valores["ar_condicionado"]))
-    valores["reformado"] = int(st.checkbox("Reformado", valores["reformado"]))
+    valores["mobiliado"] = int(st.checkbox("Mobiliado", bool(valores["mobiliado"])))
+    valores["ar_condicionado"] = int(st.checkbox("Ar-condicionado", bool(valores["ar_condicionado"])))
+    valores["reformado"] = int(st.checkbox("Reformado", bool(valores["reformado"])))
 
 elif grupo == "Localização":
-    valores["perto_metro"] = int(st.checkbox("Perto de transporte", valores["perto_metro"]))
-    valores["vista_livre"] = int(st.checkbox("Vista livre", valores["vista_livre"]))
-    valores["dist_supermercado"] = st.slider("Distância supermercado (km)", 0.1, 5.0, valores["dist_supermercado"])
-    valores["dist_posto"] = st.slider("Distância posto (km)", 0.1, 5.0, valores["dist_posto"])
-    valores["dist_hospital"] = st.slider("Distância hospital (km)", 0.1, 10.0, valores["dist_hospital"])
+    valores["perto_metro"] = int(st.checkbox("Perto de transporte", bool(valores["perto_metro"])))
+    valores["vista_livre"] = int(st.checkbox("Vista livre", bool(valores["vista_livre"])))
+
+    valores["dist_supermercado"] = st.slider(
+        "Distância supermercado (km)", 0.1, 5.0, float(valores["dist_supermercado"])
+    )
+
+    valores["dist_posto"] = st.slider(
+        "Distância posto (km)", 0.1, 5.0, float(valores["dist_posto"])
+    )
+
+    valores["dist_hospital"] = st.slider(
+        "Distância hospital (km)", 0.1, 10.0, float(valores["dist_hospital"])
+    )
 
 # =========================
 # MODELO
