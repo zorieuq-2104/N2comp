@@ -2,11 +2,10 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
 
 st.set_page_config(page_title="Avaliação de Imóveis", layout="wide")
 
-st.title("🏠 Avaliação Inteligente de Imóveis (Profissional)")
+st.title("🏠 Avaliação Inteligente de Imóveis")
 
 # =========================
 # LOCALIDADES
@@ -40,46 +39,66 @@ localidades = {
 }
 
 # =========================
-# INPUTS
+# CIDADE / BAIRRO
 # =========================
-
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 
 with col1:
     cidade = st.selectbox("Cidade", list(localidades.keys()))
-    bairro = st.selectbox("Bairro", list(localidades[cidade].keys()))
-    area = st.slider("Área (m²)", 40, 200)
-    quartos = st.slider("Quartos", 1, 5)
-    banheiros = st.slider("Banheiros", 1, 4)
 
 with col2:
-    vagas = st.slider("Vagas", 0, 3)
-    suites = st.slider("Suítes", 0, 3)
-    andar = st.slider("Andar", 0, 30)
-    idade = st.slider("Idade do imóvel", 0, 50)
-    condominio = st.slider("Condomínio (R$)", 200, 1500)
-
-with col3:
-    piscina = st.checkbox("Piscina")
-    academia = st.checkbox("Academia")
-    elevador = st.checkbox("Elevador")
-    portaria = st.checkbox("Portaria")
-    churrasqueira = st.checkbox("Churrasqueira")
-    varanda = st.checkbox("Varanda")
-    mobiliado = st.checkbox("Mobiliado")
-    ar_condicionado = st.checkbox("Ar-condicionado")
-    reformado = st.checkbox("Reformado")
-    perto_metro = st.checkbox("Perto de transporte")
-    vista_livre = st.checkbox("Vista livre")
-
-# Distâncias
-st.subheader("📍 Localização")
-dist_supermercado = st.slider("Distância ao supermercado (km)", 0.1, 5.0)
-dist_posto = st.slider("Distância ao posto (km)", 0.1, 5.0)
-dist_hospital = st.slider("Distância ao hospital (km)", 0.1, 10.0)
+    bairro = st.selectbox("Bairro", list(localidades[cidade].keys()))
 
 # =========================
-# GERAR DATASET E TREINAR
+# GRUPOS
+# =========================
+st.subheader("⚙️ Grupo de variáveis")
+
+grupo = st.selectbox("Escolha o grupo", [
+    "Estrutura",
+    "Condomínio",
+    "Interior",
+    "Localização"
+])
+
+dados_entrada = {}
+
+# =========================
+# INPUTS POR GRUPO
+# =========================
+
+if grupo == "Estrutura":
+    dados_entrada["area"] = st.slider("Área (m²)", 40, 200)
+    dados_entrada["quartos"] = st.slider("Quartos", 1, 5)
+    dados_entrada["banheiros"] = st.slider("Banheiros", 1, 4)
+    dados_entrada["vagas"] = st.slider("Vagas", 0, 3)
+    dados_entrada["suites"] = st.slider("Suítes", 0, 3)
+    dados_entrada["andar"] = st.slider("Andar", 0, 30)
+    dados_entrada["idade"] = st.slider("Idade do imóvel", 0, 50)
+
+elif grupo == "Condomínio":
+    dados_entrada["condominio"] = st.slider("Condomínio (R$)", 200, 1500)
+    dados_entrada["elevador"] = int(st.checkbox("Elevador"))
+    dados_entrada["portaria"] = int(st.checkbox("Portaria"))
+    dados_entrada["piscina"] = int(st.checkbox("Piscina"))
+    dados_entrada["academia"] = int(st.checkbox("Academia"))
+    dados_entrada["churrasqueira"] = int(st.checkbox("Churrasqueira"))
+    dados_entrada["varanda"] = int(st.checkbox("Varanda"))
+
+elif grupo == "Interior":
+    dados_entrada["mobiliado"] = int(st.checkbox("Mobiliado"))
+    dados_entrada["ar_condicionado"] = int(st.checkbox("Ar-condicionado"))
+    dados_entrada["reformado"] = int(st.checkbox("Reformado"))
+
+elif grupo == "Localização":
+    dados_entrada["perto_metro"] = int(st.checkbox("Perto de transporte"))
+    dados_entrada["vista_livre"] = int(st.checkbox("Vista livre"))
+    dados_entrada["dist_supermercado"] = st.slider("Distância supermercado (km)", 0.1, 5.0)
+    dados_entrada["dist_posto"] = st.slider("Distância posto (km)", 0.1, 5.0)
+    dados_entrada["dist_hospital"] = st.slider("Distância hospital (km)", 0.1, 10.0)
+
+# =========================
+# MODELO
 # =========================
 
 @st.cache_data
@@ -92,50 +111,50 @@ def gerar_modelo():
         bairro_r = np.random.choice(list(localidades[cidade_r].keys()))
         base_preco = localidades[cidade_r][bairro_r]
 
-        area_r = np.random.randint(40, 200)
-        quartos_r = np.random.randint(1, 5)
-        banheiros_r = np.random.randint(1, 4)
-        vagas_r = np.random.randint(0, 3)
-        suites_r = np.random.randint(0, 3)
-        andar_r = np.random.randint(0, 30)
-        idade_r = np.random.randint(0, 50)
+        area = np.random.randint(40, 200)
+        quartos = np.random.randint(1, 5)
+        banheiros = np.random.randint(1, 4)
+        vagas = np.random.randint(0, 3)
+        suites = np.random.randint(0, 3)
+        andar = np.random.randint(0, 30)
+        idade = np.random.randint(0, 50)
 
-        condominio_r = np.random.randint(200, 1500)
-        elevador_r = np.random.choice([0,1])
-        portaria_r = np.random.choice([0,1])
-        piscina_r = np.random.choice([0,1])
-        academia_r = np.random.choice([0,1])
-        churrasqueira_r = np.random.choice([0,1])
-        varanda_r = np.random.choice([0,1])
+        condominio = np.random.randint(200, 1500)
+        elevador = np.random.choice([0,1])
+        portaria = np.random.choice([0,1])
+        piscina = np.random.choice([0,1])
+        academia = np.random.choice([0,1])
+        churrasqueira = np.random.choice([0,1])
+        varanda = np.random.choice([0,1])
 
-        mobiliado_r = np.random.choice([0,1])
-        ar_r = np.random.choice([0,1])
-        reformado_r = np.random.choice([0,1])
+        mobiliado = np.random.choice([0,1])
+        ar = np.random.choice([0,1])
+        reformado = np.random.choice([0,1])
 
-        metro_r = np.random.choice([0,1])
-        vista_r = np.random.choice([0,1])
+        metro = np.random.choice([0,1])
+        vista = np.random.choice([0,1])
 
         d1 = np.random.uniform(0.1, 5)
         d2 = np.random.uniform(0.1, 5)
         d3 = np.random.uniform(0.1, 10)
 
-        preco = area_r * (base_preco/100)
-        preco += quartos_r * 15000
-        preco += banheiros_r * 12000
-        preco += vagas_r * 8000
-        preco *= (1 - idade_r * 0.005)
-        preco += andar_r * 1000
+        preco = area * (base_preco / 100)
+        preco += quartos * 15000
+        preco += banheiros * 12000
+        preco += vagas * 8000
+        preco *= (1 - idade * 0.005)
+        preco += andar * 1000
 
-        if piscina_r: preco += 30000
-        if academia_r: preco += 20000
+        if piscina: preco += 30000
+        if academia: preco += 20000
 
         dados.append([
             cidade_r, bairro_r,
-            area_r, quartos_r, banheiros_r, vagas_r,
-            condominio_r, suites_r, andar_r, idade_r,
-            elevador_r, portaria_r, piscina_r, academia_r, churrasqueira_r, varanda_r,
-            mobiliado_r, ar_r, reformado_r,
-            metro_r, vista_r,
+            area, quartos, banheiros, vagas,
+            condominio, suites, andar, idade,
+            elevador, portaria, piscina, academia, churrasqueira, varanda,
+            mobiliado, ar, reformado,
+            metro, vista,
             d1, d2, d3,
             preco
         ])
@@ -170,30 +189,8 @@ if st.button("💰 Calcular Preço"):
     entrada = pd.DataFrame(columns=colunas)
     entrada.loc[0] = 0
 
-    entrada["area"] = area
-    entrada["quartos"] = quartos
-    entrada["banheiros"] = banheiros
-    entrada["vagas"] = vagas
-    entrada["condominio"] = condominio
-    entrada["suites"] = suites
-    entrada["andar"] = andar
-    entrada["idade"] = idade
-
-    entrada["piscina"] = int(piscina)
-    entrada["academia"] = int(academia)
-    entrada["elevador"] = int(elevador)
-    entrada["portaria"] = int(portaria)
-    entrada["churrasqueira"] = int(churrasqueira)
-    entrada["varanda"] = int(varanda)
-    entrada["mobiliado"] = int(mobiliado)
-    entrada["ar_condicionado"] = int(ar_condicionado)
-    entrada["reformado"] = int(reformado)
-    entrada["perto_metro"] = int(perto_metro)
-    entrada["vista_livre"] = int(vista_livre)
-
-    entrada["dist_supermercado"] = dist_supermercado
-    entrada["dist_posto"] = dist_posto
-    entrada["dist_hospital"] = dist_hospital
+    for chave, valor in dados_entrada.items():
+        entrada[chave] = valor
 
     entrada[f"cidade_{cidade}"] = 1
     entrada[f"bairro_{bairro}"] = 1
