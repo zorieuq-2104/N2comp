@@ -50,6 +50,34 @@ with col2:
     bairro = st.selectbox("Bairro", list(localidades[cidade].keys()))
 
 # =========================
+# VALORES PADRÃO (IMPORTANTE)
+# =========================
+valores = {
+    "area": 100,
+    "quartos": 2,
+    "banheiros": 2,
+    "vagas": 1,
+    "suites": 1,
+    "andar": 5,
+    "idade": 10,
+    "condominio": 500,
+    "elevador": 1,
+    "portaria": 1,
+    "piscina": 0,
+    "academia": 0,
+    "churrasqueira": 0,
+    "varanda": 1,
+    "mobiliado": 0,
+    "ar_condicionado": 0,
+    "reformado": 0,
+    "perto_metro": 0,
+    "vista_livre": 0,
+    "dist_supermercado": 2,
+    "dist_posto": 2,
+    "dist_hospital": 5
+}
+
+# =========================
 # GRUPOS
 # =========================
 st.subheader("⚙️ Grupo de variáveis")
@@ -61,41 +89,39 @@ grupo = st.selectbox("Escolha o grupo", [
     "Localização"
 ])
 
-dados_entrada = {}
-
 # =========================
 # INPUTS POR GRUPO
 # =========================
 
 if grupo == "Estrutura":
-    dados_entrada["area"] = st.slider("Área (m²)", 40, 200)
-    dados_entrada["quartos"] = st.slider("Quartos", 1, 5)
-    dados_entrada["banheiros"] = st.slider("Banheiros", 1, 4)
-    dados_entrada["vagas"] = st.slider("Vagas", 0, 3)
-    dados_entrada["suites"] = st.slider("Suítes", 0, 3)
-    dados_entrada["andar"] = st.slider("Andar", 0, 30)
-    dados_entrada["idade"] = st.slider("Idade do imóvel", 0, 50)
+    valores["area"] = st.slider("Área (m²)", 40, 200)
+    valores["quartos"] = st.slider("Quartos", 1, 5)
+    valores["banheiros"] = st.slider("Banheiros", 1, 4)
+    valores["vagas"] = st.slider("Vagas", 0, 3)
+    valores["suites"] = st.slider("Suítes", 0, 3)
+    valores["andar"] = st.slider("Andar", 0, 30)
+    valores["idade"] = st.slider("Idade do imóvel", 0, 50)
 
 elif grupo == "Condomínio":
-    dados_entrada["condominio"] = st.slider("Condomínio (R$)", 200, 1500)
-    dados_entrada["elevador"] = int(st.checkbox("Elevador"))
-    dados_entrada["portaria"] = int(st.checkbox("Portaria"))
-    dados_entrada["piscina"] = int(st.checkbox("Piscina"))
-    dados_entrada["academia"] = int(st.checkbox("Academia"))
-    dados_entrada["churrasqueira"] = int(st.checkbox("Churrasqueira"))
-    dados_entrada["varanda"] = int(st.checkbox("Varanda"))
+    valores["condominio"] = st.slider("Condomínio (R$)", 200, 1500)
+    valores["elevador"] = int(st.checkbox("Elevador"))
+    valores["portaria"] = int(st.checkbox("Portaria"))
+    valores["piscina"] = int(st.checkbox("Piscina"))
+    valores["academia"] = int(st.checkbox("Academia"))
+    valores["churrasqueira"] = int(st.checkbox("Churrasqueira"))
+    valores["varanda"] = int(st.checkbox("Varanda"))
 
 elif grupo == "Interior":
-    dados_entrada["mobiliado"] = int(st.checkbox("Mobiliado"))
-    dados_entrada["ar_condicionado"] = int(st.checkbox("Ar-condicionado"))
-    dados_entrada["reformado"] = int(st.checkbox("Reformado"))
+    valores["mobiliado"] = int(st.checkbox("Mobiliado"))
+    valores["ar_condicionado"] = int(st.checkbox("Ar-condicionado"))
+    valores["reformado"] = int(st.checkbox("Reformado"))
 
 elif grupo == "Localização":
-    dados_entrada["perto_metro"] = int(st.checkbox("Perto de transporte"))
-    dados_entrada["vista_livre"] = int(st.checkbox("Vista livre"))
-    dados_entrada["dist_supermercado"] = st.slider("Distância supermercado (km)", 0.1, 5.0)
-    dados_entrada["dist_posto"] = st.slider("Distância posto (km)", 0.1, 5.0)
-    dados_entrada["dist_hospital"] = st.slider("Distância hospital (km)", 0.1, 10.0)
+    valores["perto_metro"] = int(st.checkbox("Perto de transporte"))
+    valores["vista_livre"] = int(st.checkbox("Vista livre"))
+    valores["dist_supermercado"] = st.slider("Distância supermercado (km)", 0.1, 5.0)
+    valores["dist_posto"] = st.slider("Distância posto (km)", 0.1, 5.0)
+    valores["dist_hospital"] = st.slider("Distância hospital (km)", 0.1, 10.0)
 
 # =========================
 # MODELO
@@ -186,10 +212,11 @@ modelo, colunas = gerar_modelo()
 # =========================
 
 if st.button("💰 Calcular Preço"):
+
     entrada = pd.DataFrame(columns=colunas)
     entrada.loc[0] = 0
 
-    for chave, valor in dados_entrada.items():
+    for chave, valor in valores.items():
         entrada[chave] = valor
 
     entrada[f"cidade_{cidade}"] = 1
